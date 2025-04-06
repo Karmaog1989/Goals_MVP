@@ -1,51 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <title>Goal Tracker</title>
     <style>
         body {
             font-family: sans-serif;
             background-color: #f4f4f4;
             margin: 20px;
+            font-size: 30px; /* Set a base font size */
         }
         h1 {
             color: #333;
             text-align: center;
             margin-bottom: 20px;
+            font-size: 2em; /* Larger heading */
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em; /* Slightly larger labels */
+        }
+        input[type="text"],
+        input[type="date"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%; /* Make input fields take full width */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            font-size: 1em; /* Adjust input text size */
+        }
+        button[type="submit"] {
+            background-color: #5cb85c;
+            color: white;
+            padding: 12px 20px; /* Slightly larger button padding */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em; /* Slightly larger button text */
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #4cae4c;
         }
         p a {
             display: inline-block;
+            margin-top: 15px;
             padding: 10px 15px;
-            background-color: #5cb85c;
+            background-color: #f0ad4e;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-bottom: 15px;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
         }
         p a:hover {
-            background-color: #4cae4c;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            background-color: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        .overdue {
-            color: red;
-            font-weight: bold;
-        }
-        .due-today {
-            color: orange;
-            font-weight: bold;
-        }
-        .upcoming {
-            color: green;
+            background-color: #ec971f;
         }
     </style>
 </head>

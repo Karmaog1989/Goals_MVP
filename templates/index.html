@@ -1,72 +1,159 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <title>Goal Tracker</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            background-color: #f4f4f4;
-            margin: 20px;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        p a {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: #5cb85c;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-        p a:hover {
-            background-color: #4cae4c;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            background-color: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        .overdue {
-            color: red;
-            font-weight: bold;
-        }
-        .due-today {
-            color: orange;
-            font-weight: bold;
-        }
-        .upcoming {
-            color: green;
-        }
-    </style>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Goal Tracker</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                background-color: #f4f4f4;
+                margin: 20px;
+                font-size: 30px; /* Set a base font size */
+            }
+            h1 {
+                color: #333;
+                text-align: center;
+                margin-bottom: 20px;
+                font-size: 2em; /* Larger heading */
+            }
+            p a {
+                display: inline-block;
+                padding: 12px 20px; /* Slightly larger button padding */
+                background-color: #5cb85c;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                font-size: 1.1em; /* Slightly larger link text */
+            }
+            p a:hover {
+                background-color: #4cae4c;
+            }
+            ul {
+                list-style: none;
+                padding: 0;
+            }
+            li {
+                background-color: white;
+                padding: 15px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                font-size: 1em; /* Adjust list item text size */
+            }
+            li strong {
+                font-size: 1.1em; /* Make the description a bit bolder and larger */
+            }
+            .overdue {
+                color: red;
+                font-weight: bold;
+                font-size: 1em; /* Adjust status text size */
+            }
+            .due-today {
+                color: orange;
+                font-weight: bold;
+                font-size: 1em; /* Adjust status text size */
+            }
+            .upcoming {
+                color: green;
+                font-size: 1em; /* Adjust status text size */
+            }
+
+            /* Optional: Add media queries for smaller screens */
+            @media (max-width: 600px) {
+                body {
+                    font-size: 18px; /* Further increase base font size on small screens */
+                }
+                h1 {
+                    font-size: 2.5em;
+                }
+                p a {
+                    font-size: 1.2em;
+                }
+                li {
+                    padding: 18px;
+                    font-size: 1.1em;
+                }
+                li strong {
+                    font-size: 1.2em;
+                }
+                .overdue, .due-today, .upcoming {
+                    font-size: 1.1em;
+                }
+            }
+            /* Your existing styles here */
+    .completed-goals-section {
+        margin-top: 180px; /* Increased margin to create more space */
+        padding: 15px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+    }
+    .completed-goals-section h2 {
+        color: #383d41;
+        margin-bottom: 10px;
+        text-align: center; /* Added to center the text */
+    }
+    .completed-goals-section ul {
+        list-style: none;
+        padding: 0;
+    }
+    .completed-goals-section li {
+        background-color: #f8f9fa;
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 3px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .completed-goal-details {
+        font-size: 0.9em;
+        color: #6c757d;
+    }
+        </style>
 </head>
 <body>
-    <h1>Your Goals</h1>
+    <h1>Active Goals</h1>
     <p><a href="{{ url_for('add_goal') }}">Add New Goal</a></p>
 
-    {% if goals %}
+    {% if active_goals %}
     <ul>
-        {% for goal in goals %}
+        {% for goal in active_goals %}
         <li>
-            <strong>{{ goal.description }}</strong>
+            <strong>{{ goal['description'] }}</strong>
             <br>
-            Deadline: {{ goal.deadline }}
+            Deadline: {{ goal['deadline'] }}
             <br>
-            Status: {{ goal.status }}
+            Status: {{ goal['status'] }}
+            <form method="POST" action="{{ url_for('complete_goal', goal_id=goal['id']) }}" style="display: inline;">
+                <input type="hidden" name="goal_id" value="{{ goal['id'] }}">
+                <button type="submit">Complete</button>
         </li>
         {% endfor %}
     </ul>
     {% else %}
     <p>No goals added yet!</p>
     {% endif %}
+
+    <div class="completed-goals-section">
+        <h2>Completed Goals</h2>
+        {% if completed_goals %}
+        <ul>
+            {% for goal in completed_goals %}
+            <li>
+                <strong>{{ goal.description }}</strong>
+                <div class="completed-goal-details">
+                    Deadline: {{ goal.deadline }} | Completed On: {{ goal.completion_date }}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No goals completed yet!</p>
+        {% endif %}
+    </div>
+
 </body>
 </html>
