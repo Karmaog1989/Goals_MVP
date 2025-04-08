@@ -112,6 +112,29 @@
         font-size: 0.9em;
         color: #6c757d;
     }
+    /* New CSS for the Complete button */
+            li form button[type="submit"] {
+                background-color: #007bff; /* A more prominent blue color */
+                color: white;
+                padding: 15px 25px; /* Increased padding for a bigger button */
+                border: none;
+                border-radius: 8px; /* More rounded corners */
+                cursor: pointer;
+                font-size: 0.6em; /* Larger font size */
+                font-weight: bold; /* Make the text bold */
+
+            }
+
+            li form button[type="submit"]:hover {
+                background-color: #0056b3; /* Darker shade on hover */
+                transform: scale(1.05); /* Slightly scale up on hover for added pop */
+            }
+
+            /* Adjust the inline form style to manage button spacing */
+            li form {
+                display: inline-block; /* Keep it inline with other elements in the li */
+                margin-left: 100px; /* Add some space between the text and the button */
+            }
         </style>
 </head>
 <body>
@@ -127,6 +150,8 @@
             Deadline: {{ goal['deadline'] }}
             <br>
             Status: {{ goal['status'] }}
+            <br>
+            Category: {{ goal['category'] }}
             <form method="POST" action="{{ url_for('complete_goal', goal_id=goal['id']) }}" style="display: inline;">
                 <input type="hidden" name="goal_id" value="{{ goal['id'] }}">
                 <button type="submit">Complete</button>
@@ -143,9 +168,9 @@
         <ul>
             {% for goal in completed_goals %}
             <li>
-                <strong>{{ goal.description }}</strong>
+                <strong>{{ goal['description'] }}</strong>
                 <div class="completed-goal-details">
-                    Deadline: {{ goal.deadline }} | Completed On: {{ goal.completion_date }}
+                    Deadline: {{ goal['deadline'] }} | Completed On: {{ goal['completion_date'] }} | Category: {{ goal['completed_category'] }}
                 </div>
             </li>
             {% endfor %}

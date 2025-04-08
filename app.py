@@ -3,6 +3,8 @@ import sqlite3
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, g # Import 'g'
 
+goal_categories = ["Work", "Family", "Finance", "Personal", "Health", "Relationships", "Learning", "Bucket List", "Giving" ]
+
 app = Flask(__name__)
 
 """
@@ -73,18 +75,19 @@ def add_goal():
     if request.method == "POST":
         description = request.form['description']
         deadline_str = request.form['deadline']
+        category = request.form['category'] #gets the category
         db = get_db()
         try:
-            deadline = datetime.datetime.strptime(deadline_str, "%Y-%m-%d").date() # Assuming your HTML form uses YYYY-MM-DD
-            db.execute('INSERT INTO goals (description, deadline) VALUES (?, ?)',
-                       (description, deadline.strftime('%Y-%m-%d')))
+            deadline = datetime.datetime.strptime(deadline_str, "%Y-%m-%d").date()
+            db.execute('INSERT INTO goals (description, deadline, category) VALUES (?, ?, ?)',
+                       (description, deadline.strftime('%Y-%m-%d'), category)) # Include category
             db.commit()
             return redirect(url_for('index'))
         except ValueError:
             return "Invalid date format"
         finally:
             close_db() # Explicitly close the connection for now, though teardown will also handle it
-    return render_template('add.html')
+    return render_template('add.html', goal_categories=goal_categories)  # Pass categories to the template
 
 """
 @app.route('/add', methods=["GET", "POST"])
@@ -105,8 +108,8 @@ def add_goal():
 @app.route('/')
 def index():
     conn = get_db()
-    goals_db = conn.execute('SELECT id, description, deadline FROM goals').fetchall()
-    completed_goals_db = conn.execute('SELECT id, description, deadline, completion_date FROM goals_completed').fetchall()
+    goals_db = conn.execute('SELECT id, description, deadline, category FROM goals').fetchall() #Get category
+    completed_goals_db = conn.execute('SELECT id, description, deadline, completion_date, completed_category FROM goals_completed').fetchall()
     conn.close()
     active_goals = []
     current_date = datetime.date.today()
@@ -118,11 +121,11 @@ def index():
             status = "Past Due"
         elif deadline == current_date:
             status = "Due Today"
-        active_goals.append({'id': row['id'], 'description': row['description'], 'deadline': deadline, 'status': status})
+        active_goals.append({'id': row['id'], 'description': row['description'], 'deadline': deadline, 'status': status, 'category': row['category']}) #appended category
     completed_goals = []
     if completed_goals_db: # Check if there are any completed goals
         for row in completed_goals_db:
-            completed_goals.append({'id': row['id'], 'description': row['description'], 'deadline': row['deadline'], 'completion_date': row['completion_date']})
+            completed_goals.append({'id': row['id'], 'description': row['description'], 'deadline': row['deadline'], 'completion_date': row['completion_date'], 'completed_category': row['completed_category']}) #Add to completed goals
 
     return render_template('index.html', active_goals=active_goals, completed_goals=completed_goals)
 
@@ -133,13 +136,13 @@ def complete_goal(goal_id):
     db = get_db()
     try:
         # Fetch the goal details from the active goals table
-        goal = db.execute('SELECT description, deadline FROM goals WHERE id = ?', (goal_id,)).fetchone()
+        goal = db.execute('SELECT description, deadline, category FROM goals WHERE id = ?', (goal_id,)).fetchone()
 
         if goal:
             # Insert the goal into the completed goals table with the completion date
             completion_date = datetime.date.today().strftime('%Y-%m-%d')
-            db.execute('INSERT INTO goals_completed (description, deadline, completion_date) VALUES (?, ?, ?)',
-                       (goal['description'], goal['deadline'], completion_date))
+            db.execute('INSERT INTO goals_completed (description, deadline, completion_date, completed_category) VALUES (?, ?, ?, ?)',
+                       (goal['description'], goal['deadline'], completion_date, goal['category']))
 
             # Delete the goal from the active goals table
             db.execute('DELETE FROM goals WHERE id = ?', (goal_id,))

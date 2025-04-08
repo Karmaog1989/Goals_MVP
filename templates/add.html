@@ -58,6 +58,22 @@
         p a:hover {
             background-color: #ec971f;
         }
+        /* Added these styles for the category section */
+    label[for="category"] { /* Style the category label */
+        display: block;
+        margin-bottom: 5px;
+        font-size: 1.1em;
+    }
+
+    select#category { /* Style the category dropdown */
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 1em;
+    }
     </style>
 </head>
 <body>
@@ -71,6 +87,14 @@
         <div>
             <label for="deadline">Deadline (YYYY-MM-DD):</label><br>
             <input type="date" id="deadline" name="deadline" required>
+        </div>
+        <div>
+            <label for="category">Category:</label><br>
+            <select id="category" name="category">
+            {% for category in goal_categories %}
+            <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
         </div>
         <br>
         <button type="submit">Add Goal</button>
